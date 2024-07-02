@@ -13,10 +13,21 @@ import { Input } from "~/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { PlusCircleIcon, Undo2 } from "lucide-react";
-import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
+import { Button } from "./ui/button";
+import { Checkbox } from "./ui/checkbox";
 
-const Form = ({ onClose }: { onClose: () => void }) => {
+interface DataType {
+  quizName: string;
+  questionName: string;
+}
+
+const Form = ({
+  onClose,
+  onSubmit: handleFormSubmit,
+}: {
+  onClose: () => void;
+  onSubmit: (data: DataType) => void;
+}) => {
   const [fields, setFields] = useState([{ id: 0, name: "variant1" }]);
 
   const addField = (event: React.FormEvent) => {
@@ -26,6 +37,7 @@ const Form = ({ onClose }: { onClose: () => void }) => {
       { id: fields.length + 1, name: `variant${fields.length + 1}` },
     ]);
   };
+
   const formSchema = z.object({
     quizName: z.string().min(2, {
       message: "Quiz name must be at least 2 characters.",
@@ -33,20 +45,15 @@ const Form = ({ onClose }: { onClose: () => void }) => {
     questionName: z.string().min(2, {
       message: "Question name must be at least 2 characters.",
     }),
-    ...fields.reduce((acc: Record<string, z.ZodString>, field) => {
-      acc[field.name] = z.string().min(2, {
-        message: `${field.name} must be at least 2 characters.`,
-      });
-      return acc;
-    }, {}),
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<DataType>({
     resolver: zodResolver(formSchema),
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  function onSubmit(values: DataType) {
+    handleFormSubmit(values);
+    onClose();
   }
 
   return (
@@ -59,6 +66,7 @@ const Form = ({ onClose }: { onClose: () => void }) => {
         >
           <Undo2 />
         </Button>
+
         <FormProvider {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -71,12 +79,17 @@ const Form = ({ onClose }: { onClose: () => void }) => {
                 <FormItem>
                   <FormLabel>Name of Quiz</FormLabel>
                   <FormControl>
-                    <Input placeholder="Quiz Name" {...field} />
+                    <Input
+                      {...field}
+                      placeholder="Quiz Name"
+                      value={field.value || ""}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="questionName"
@@ -84,32 +97,17 @@ const Form = ({ onClose }: { onClose: () => void }) => {
                 <FormItem>
                   <FormLabel>Name of Question</FormLabel>
                   <FormControl>
-                    <Input placeholder="Question Name" {...field} />
+                    <Input
+                      {...field}
+                      placeholder="Question Name"
+                      value={field.value || ""}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {fields.map((field) => (
-              <FormField
-                key={field.id}
-                control={form.control}
-                name={field.name}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Variant</FormLabel>
-                    <FormControl>
-                      <div className="flex w-full flex-row items-center gap-2">
-                        <Input placeholder="Answer" {...field} />
-                        <h2 className="font-semibold">Correct?</h2>
-                        <Checkbox />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
+
             <div className="flex items-center gap-2">
               <h5 className="text-lg font-semibold">Add variant</h5>
               <Button variant="default" onClick={(e) => addField(e)}>

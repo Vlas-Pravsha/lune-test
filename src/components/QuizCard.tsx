@@ -1,21 +1,16 @@
 import { Label } from "~/components/ui/label";
 import { RadioGroupItem } from "~/components/ui/radio-group";
-import { Separator } from "~/components/ui/separator";
 
 import React from "react";
 
-type CardItemType = {
+type OptionType = {
   id: string;
   title: string;
   variants: Array<string>;
   correct: number;
 };
 
-interface CardItemProps {
-  option: CardItemType;
-}
-
-const CardItem = ({ option }: CardItemProps) => {
+const QuizCard = ({ option }: { option: OptionType }) => {
   return (
     <>
       <h2>{option.title}</h2>
@@ -32,4 +27,4 @@ const CardItem = ({ option }: CardItemProps) => {
   );
 };
 
-export default CardItem;
+export default QuizCard;

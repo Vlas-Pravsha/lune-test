@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { RadioGroup } from "~/components/ui/radio-group";
 import {
   Card,
@@ -12,34 +13,21 @@ import {
 import { Button } from "~/components/ui/button";
 import { Edit, Play, Trash } from "lucide-react";
 import { useLocalStorage } from "~/lib/hooks/useLocalStorage";
-import CardItem from "../CardItem";
-import { useState } from "react";
+import CardItem from "./QuizCard";
+import Result from "./Result";
+import { type Quiz } from "./QuizClientComponent";
 
-interface CardItemType {
-  id: string;
+interface QuizList {
+  quizLists: Quiz[];
   title: string;
-  variants: Array<string>;
-  correct: number;
-}
-
-interface CardListProps {
-  options: CardItemType[];
-  title: string;
-  setOptions: (options: CardItemType[]) => void;
   id: string;
   handleRemoveQuiz: (id: string) => void;
+  setQuizLists?: React.Dispatch<React.SetStateAction<Quiz[]>>;
 }
-
-const CardList = ({
-  setOptions,
-  options,
-  title,
-  id,
-  handleRemoveQuiz,
-}: CardListProps) => {
+const QuizList = ({ quizLists, title, id, handleRemoveQuiz }: QuizList) => {
   const [step, setStep] = useState<number>(0);
+  const options = quizLists.find((quiz) => quiz.id === id)?.options ?? [];
   const option = options[step];
-  console.log(option);
 
   const { setItem } = useLocalStorage("selectedOption");
 
@@ -56,16 +44,15 @@ const CardList = ({
       <CardContent>
         <RadioGroup
           onValueChange={(value) => {
-            console.log(value);
             setItem(value);
           }}
           className="flex flex-col gap-4"
         >
-          {option ? <CardItem option={option} /> : <div> Good job!</div>}
+          {option ? <CardItem option={option} /> : <Result options={options} />}
         </RadioGroup>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button onClick={() => handleNextStep()}>Next</Button>
+        <Button onClick={handleNextStep}>Next</Button>
         <div className="flex flex-row gap-2">
           <Button variant="ghost">
             <Play />
@@ -82,4 +69,4 @@ const CardList = ({
   );
 };
 
-export default CardList;
+export default QuizList;

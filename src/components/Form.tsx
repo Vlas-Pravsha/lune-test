@@ -1,60 +1,52 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
+  Form,
 } from "~/components/ui/form";
-import { FormProvider, useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { Input } from "~/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { PlusCircleIcon, Undo2 } from "lucide-react";
+import { Delete, PlusCircleIcon, Undo2 } from "lucide-react";
 import { Button } from "./ui/button";
-import { Checkbox } from "./ui/checkbox";
 
-interface DataType {
-  quizName: string;
-  questionName: string;
-}
-
-const Form = ({
-  onClose,
-  onSubmit: handleFormSubmit,
-}: {
-  onClose: () => void;
-  onSubmit: (data: DataType) => void;
-}) => {
-  const [fields, setFields] = useState([{ id: 0, name: "variant1" }]);
-
-  const addField = (event: React.FormEvent) => {
-    event.preventDefault();
-    setFields([
-      ...fields,
-      { id: fields.length + 1, name: `variant${fields.length + 1}` },
-    ]);
-  };
+const Forma = ({ onClose }: { onClose: () => void }) => {
+  const optionsSheme = z.object({
+    id: z.string(),
+    correct: z.number(),
+    variants: z.array(z.string()),
+    title: z.string(),
+  });
 
   const formSchema = z.object({
-    quizName: z.string().min(2, {
-      message: "Quiz name must be at least 2 characters.",
-    }),
-    questionName: z.string().min(2, {
-      message: "Question name must be at least 2 characters.",
-    }),
+    title: z.string(),
+    id: z.string(),
+    options: z.array(optionsSheme),
   });
 
-  const form = useForm<DataType>({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      id: "",
+      options: [{ id: "", title: "", variants: ["1"], correct: 0 }],
+    },
   });
 
-  function onSubmit(values: DataType) {
-    handleFormSubmit(values);
-    onClose();
-  }
+  const onSubmit = form.handleSubmit((values) => {
+    console.log(values);
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    name: "options",
+    control: form.control,
+  });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -66,60 +58,76 @@ const Form = ({
         >
           <Undo2 />
         </Button>
-
-        <FormProvider {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-4"
-          >
+        <Form {...form}>
+          <form onSubmit={onSubmit} className="space-y-8">
             <FormField
               control={form.control}
-              name="quizName"
+              name="title"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Name of Quiz</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Quiz Name"
-                      value={field.value || ""}
-                    />
+                    <Input {...field} placeholder="Name of Quiz" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="questionName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name of Question</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Question Name"
-                      value={field.value || ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {fields.map((field, index) => (
+              <div key={field.id} className="flex flex-col gap-4">
+                <FormField
+                  control={form.control}
+                  name={`options.${index}.title`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Question name</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Question name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {field.variants.map((variant, index) => {
+                  return (
+                    <FormItem key={`${variant} ${index}`}>
+                      <FormLabel>Answer</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Answer" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                })}
+              </div>
+            ))}
 
             <div className="flex items-center gap-2">
-              <h5 className="text-lg font-semibold">Add variant</h5>
-              <Button variant="default" onClick={(e) => addField(e)}>
+              <h5 className="text-lg font-semibold">Add options</h5>
+              <Button
+                variant="default"
+                onClick={() =>
+                  append({
+                    id: "",
+                    title: "",
+                    variants: [],
+                    correct: 0,
+                  })
+                }
+              >
                 <PlusCircleIcon />
               </Button>
             </div>
-            <Button type="submit">Submit</Button>
+
+            <Button type="submit" className="w-full">
+              Submit
+            </Button>
           </form>
-        </FormProvider>
+        </Form>
       </div>
     </div>
   );
 };
 
-export default Form;
+export default Forma;

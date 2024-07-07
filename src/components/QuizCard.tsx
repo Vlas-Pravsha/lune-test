@@ -15,7 +15,6 @@ import { Edit, Play, Trash } from "lucide-react";
 import { useLocalStorage } from "~/lib/hooks/useLocalStorage";
 import Result from "./Result";
 import { type Quiz } from "./QuizClientComponent";
-import Link from "next/link";
 import { Label } from "~/components/ui/label";
 
 interface QuizCardProps {
@@ -88,11 +87,9 @@ const QuizCard: React.FC<QuizCardProps> = ({
           Next
         </Button>
         <div className="flex flex-row gap-2">
-          <Link href={`/quiz/${id}`}>
-            <Button variant="ghost">
-              <Play />
-            </Button>
-          </Link>
+          <Button variant="ghost">
+            <Play />
+          </Button>
           <Button variant="ghost">
             <Edit />
           </Button>

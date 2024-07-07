@@ -107,21 +107,34 @@ const Forma = ({
                       {field.value.map((_: string, vIndex: number) => (
                         <FormItem key={`${index}.variants.${vIndex}`}>
                           <FormLabel>Answer {vIndex + 1}</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...form.register(
-                                `options.${index}.variants.${vIndex}`,
-                              )}
-                              placeholder={`Answer ${vIndex + 1}`}
-                            />
-                          </FormControl>
-                          <FormMessage />
+                          <div className="flex flex-row items-center justify-center gap-2">
+                            <FormControl>
+                              <Input
+                                {...form.register(
+                                  `options.${index}.variants.${vIndex}`,
+                                )}
+                                placeholder={`Answer ${vIndex + 1}`}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                            <Button
+                              type="button"
+                              variant="default"
+                              className="flex gap-2"
+                              onClick={(e) => {
+                                console.log(e);
+                              }}
+                            >
+                              <Trash />
+                              Delete Answer
+                            </Button>
+                          </div>
                         </FormItem>
                       ))}
                       <Button
                         type="button"
                         variant="default"
-                        className="mt-4 flex gap-2"
+                        className="mt-4 flex w-full gap-2"
                         onClick={() => {
                           form.setValue(`options.${index}.variants`, [
                             ...field.value,

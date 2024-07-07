@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import QuizCard from "~/components/QuizCard";
 import Forma from "~/components/Form";
+import { Input } from "./ui/input";
 
 export type QuizOption = {
   id: string;
@@ -67,6 +68,7 @@ const initialQuizzes: Quiz[] = [
 export default function QuizClientComponent() {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [quizLists, setQuizLists] = useState<Quiz[]>(initialQuizzes);
+  const [searchValue, setSearchValue] = useState<string>("");
 
   const onClose = () => {
     setIsFormVisible(false);
@@ -96,9 +98,20 @@ export default function QuizClientComponent() {
     setQuizLists((prevQuizLists) => [...prevQuizLists, newQuiz]);
   }
 
+  const filteredItems = quizLists.filter((list) =>
+    list.title.toLowerCase().includes(searchValue.trim().toLowerCase()),
+  );
+
   return (
-    <main className="m-20 flex flex-wrap gap-10">
-      {quizLists.map((quiz) => (
+    <main className="m-10 flex flex-wrap gap-10">
+      <Input
+        type="text"
+        placeholder="Name of Quiz"
+        value={searchValue}
+        onChange={(e) => setSearchValue(e.target.value.toLowerCase())}
+      />
+
+      {filteredItems.map((quiz) => (
         <QuizCard
           setQuizLists={setQuizLists}
           quizLists={quizLists}

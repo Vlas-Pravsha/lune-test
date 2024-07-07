@@ -13,10 +13,17 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { Input } from "~/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Delete, PlusCircleIcon, Undo2 } from "lucide-react";
+import { PlusCircleIcon, Trash, Undo2 } from "lucide-react";
 import { Button } from "./ui/button";
+import { type Quiz } from "./QuizClientComponent";
 
-const Forma = ({ onClose }: { onClose: () => void }) => {
+const Forma = ({
+  onClose,
+  handleFormSubmit,
+}: {
+  onClose: () => void;
+  handleFormSubmit: (value: Quiz) => void;
+}) => {
   const optionsSheme = z.object({
     id: z.string(),
     correct: z.number(),
@@ -35,12 +42,14 @@ const Forma = ({ onClose }: { onClose: () => void }) => {
     defaultValues: {
       title: "",
       id: "",
-      options: [{ id: "", title: "", variants: ["1"], correct: 0 }],
+      options: [{ id: "", title: "", variants: ["Answer 1"], correct: 0 }],
     },
   });
 
   const onSubmit = form.handleSubmit((values) => {
     console.log(values);
+    handleFormSubmit(values);
+    onClose();
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -49,7 +58,7 @@ const Forma = ({ onClose }: { onClose: () => void }) => {
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50">
       <div className="relative w-full max-w-md rounded bg-white p-8 shadow-md">
         <Button
           className="absolute right-2 top-2"
@@ -89,17 +98,68 @@ const Forma = ({ onClose }: { onClose: () => void }) => {
                     </FormItem>
                   )}
                 />
-                {field.variants.map((variant, index) => {
-                  return (
-                    <FormItem key={`${variant} ${index}`}>
-                      <FormLabel>Answer</FormLabel>
+
+                <FormField
+                  control={form.control}
+                  name={`options.${index}.variants`}
+                  render={({ field }) => (
+                    <div>
+                      {field.value.map((_: string, vIndex: number) => (
+                        <FormItem key={`${index}.variants.${vIndex}`}>
+                          <FormLabel>Answer {vIndex + 1}</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...form.register(
+                                `options.${index}.variants.${vIndex}`,
+                              )}
+                              placeholder={`Answer ${vIndex + 1}`}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="default"
+                        className="mt-4 flex gap-2"
+                        onClick={() => {
+                          form.setValue(`options.${index}.variants`, [
+                            ...field.value,
+                            `Answer ${field.value.length + 1}`,
+                          ]);
+                        }}
+                      >
+                        <PlusCircleIcon />
+                        Add Answer
+                      </Button>
+                    </div>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`options.${index}.correct`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Correct Answer Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="Answer" />
+                        <Input
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  );
-                })}
+                  )}
+                />
+                <div className="flex items-center gap-2">
+                  <h5 className="text-lg font-semibold">Delete options</h5>
+                  <Button variant="default" onClick={() => remove(index)}>
+                    <Trash />
+                  </Button>
+                </div>
               </div>
             ))}
 
@@ -107,14 +167,15 @@ const Forma = ({ onClose }: { onClose: () => void }) => {
               <h5 className="text-lg font-semibold">Add options</h5>
               <Button
                 variant="default"
-                onClick={() =>
+                onClick={(event) => {
+                  event.preventDefault();
                   append({
                     id: "",
                     title: "",
                     variants: [],
                     correct: 0,
-                  })
-                }
+                  });
+                }}
               >
                 <PlusCircleIcon />
               </Button>

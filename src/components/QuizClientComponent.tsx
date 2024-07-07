@@ -29,10 +29,36 @@ const initialQuizzes: Quiz[] = [
         variants: [
           "Это простой HTML",
           "Это функция",
-          "Это тот же HTML, но с возможностью выполнять JS-код",
+          "Это тот же HTML, но c возможностью выполнять JS-код",
         ],
         correct: 2,
         id: "1-1",
+      },
+    ],
+  },
+  {
+    id: "2",
+    title: "react quiz",
+    options: [
+      {
+        title: "Кто создал CSS?",
+        variants: [
+          "Это простой HTML",
+          "Это функция",
+          "Это тот же HTML, но c возможностью выполнять JS-код",
+        ],
+        correct: 2,
+        id: "2-1",
+      },
+      {
+        title: "Кто создал CSSasa?",
+        variants: [
+          "Это простой HTML",
+          "Это функция",
+          "Это тот же HTML, но с возможностью выполнять JS-код",
+        ],
+        correct: 2,
+        id: "2-2",
       },
     ],
   },
@@ -55,6 +81,21 @@ export default function QuizClientComponent() {
     setQuizLists(newOptions);
   }
 
+  function handleFormSubmit(data: Quiz) {
+    const newQuiz = {
+      id: crypto.randomUUID(),
+      title: data.title,
+      options: data.options!.map((option) => ({
+        id: crypto.randomUUID(),
+        title: option.title,
+        variants: option.variants,
+        correct: option.correct,
+      })),
+    };
+
+    setQuizLists((prevQuizLists) => [...prevQuizLists, newQuiz]);
+  }
+
   return (
     <main className="m-20 flex flex-wrap gap-10">
       {quizLists.map((quiz) => (
@@ -72,7 +113,9 @@ export default function QuizClientComponent() {
         <Plus className="absolute bottom-12 right-12 h-10 w-10" />
       </Button>
 
-      {isFormVisible && <Forma onClose={onClose} />}
+      {isFormVisible && (
+        <Forma onClose={onClose} handleFormSubmit={handleFormSubmit} />
+      )}
     </main>
   );
 }

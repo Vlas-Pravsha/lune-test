@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { PlusCircleIcon, Trash, Undo2 } from "lucide-react";
 import { Button } from "./ui/button";
-import { type Quiz } from "./QuizClientComponent";
+import { type Quiz } from "./QuizClient";
 
 const Forma = ({
   onClose,
@@ -27,12 +27,12 @@ const Forma = ({
   const optionsSheme = z.object({
     id: z.string(),
     correct: z.number(),
-    variants: z.array(z.string()),
-    title: z.string(),
+    variants: z.array(z.string().min(2)),
+    title: z.string().min(2),
   });
 
   const formSchema = z.object({
-    title: z.string(),
+    title: z.string().min(2),
     id: z.string(),
     options: z.array(optionsSheme),
   });

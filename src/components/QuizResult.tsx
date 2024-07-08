@@ -1,11 +1,11 @@
 import React from "react";
-import { type QuizOption } from "./QuizClientComponent";
+import { type Option } from "./QuizClient";
 
-const Result = ({
+const QuizResult = ({
   options,
   correct,
 }: {
-  options: QuizOption[];
+  options: Option[];
   correct: number;
 }) => {
   return (
@@ -15,4 +15,4 @@ const Result = ({
   );
 };
 
-export default Result;
+export default QuizResult;

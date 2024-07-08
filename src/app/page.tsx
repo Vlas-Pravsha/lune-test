@@ -1,7 +1,7 @@
-import QuizClientComponent from "~/components/QuizClientComponent";
+import QuizClient from "~/components/QuizClient";
 
 function HomePage() {
-  return <QuizClientComponent />;
+  return <QuizClient />;
 }
 
 export default HomePage;

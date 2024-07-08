@@ -7,7 +7,7 @@ import QuizCard from "~/components/QuizCard";
 import Forma from "~/components/Form";
 import { Input } from "./ui/input";
 
-export type QuizOption = {
+export type Option = {
   id: string;
   correct: number;
   title: string;
@@ -17,10 +17,10 @@ export type QuizOption = {
 export interface Quiz {
   id: string;
   title: string;
-  options?: QuizOption[];
+  options?: Option[];
 }
 
-const initialQuizzes: Quiz[] = [
+export const initialQuizzes: Quiz[] = [
   {
     id: "1",
     title: "vue quiz",
@@ -65,7 +65,7 @@ const initialQuizzes: Quiz[] = [
   },
 ];
 
-export default function QuizClientComponent() {
+export default function QuizClient() {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [quizLists, setQuizLists] = useState<Quiz[]>(initialQuizzes);
   const [searchValue, setSearchValue] = useState<string>("");
@@ -98,6 +98,10 @@ export default function QuizClientComponent() {
     setQuizLists((prevQuizLists) => [...prevQuizLists, newQuiz]);
   }
 
+  function getSearchValue(event: React.ChangeEvent<HTMLInputElement>) {
+    setSearchValue(event.target.value.toLowerCase());
+  }
+
   const filteredItems = quizLists.filter((list) =>
     list.title.toLowerCase().includes(searchValue.trim().toLowerCase()),
   );
@@ -106,20 +110,13 @@ export default function QuizClientComponent() {
     <main className="m-10 flex flex-wrap gap-10">
       <Input
         type="text"
-        placeholder="Name of Quiz"
+        placeholder="Search by title"
         value={searchValue}
-        onChange={(e) => setSearchValue(e.target.value.toLowerCase())}
+        onChange={(event) => getSearchValue(event)}
       />
 
       {filteredItems.map((quiz) => (
-        <QuizCard
-          setQuizLists={setQuizLists}
-          quizLists={quizLists}
-          title={quiz.title}
-          key={quiz.id}
-          id={quiz.id}
-          handleRemoveQuiz={handleRemoveQuiz}
-        />
+        <QuizCard quiz={quiz} key={quiz.id} onRemove={handleRemoveQuiz} />
       ))}
 
       <Button variant="ghost" onClick={handleToggle}>

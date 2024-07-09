@@ -20,6 +20,7 @@ import {
   type Option,
 } from "~/components/QuizClient";
 import { useLocalStorage } from "~/lib/hooks/useLocalStorage";
+import Timer from "~/components/Timer";
 
 interface QuizIdProps {
   params: { id: string };
@@ -65,6 +66,7 @@ export default function QuizId({ params, title }: QuizIdProps) {
           <CardDescription>
             Number of questions: {options.length}
           </CardDescription>
+          <Timer initialTime={30} callback={handleNextStep}/>
         </CardHeader>
         <CardContent>
           <RadioGroup

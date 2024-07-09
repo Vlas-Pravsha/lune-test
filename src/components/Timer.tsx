@@ -1,29 +1,39 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from 'react';
+
+const MILLISECONDS = 1000;
 
 interface TimerProps {
-  duration: number;
-  onTimeUp: () => void;
+  initialTime: number;
+  callback: () => void
 }
 
-const Timer: React.FC<TimerProps> = ({ duration, onTimeUp }) => {
-  const [timeLeft, setTimeLeft] = useState(duration);
+type Ref = ReturnType<typeof setTimeout>
+
+const Timer = ({initialTime, callback}: TimerProps) => {
+  const [seconds, setSeconds] = useState(initialTime);
+  const deadlineRef = useRef(Date.now() + initialTime * MILLISECONDS);
+  const ref = useRef<Ref>();
+
+  const getTime = (deadline: number) => {
+    const time = deadline - Date.now();
+    const calcSeconds = (Math.floor((time / MILLISECONDS) % 60));
+    setSeconds(calcSeconds)
+
+    if (calcSeconds <= 0) {
+      clearInterval(ref.current);
+      setSeconds(initialTime);
+      // callback()
+      return;
+    }
+  };
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(intervalId);
-          onTimeUp();
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
+    ref.current = setInterval(() => getTime(deadlineRef.current), 200);
 
-    return () => clearInterval(intervalId);
-  }, [duration, onTimeUp]);
+    return () => clearInterval(ref.current);
+  }, []);
 
-  return <div className="timer">{timeLeft} seconds left</div>;
+  return seconds;
 };
 
 export default Timer;

@@ -63,10 +63,12 @@ export default function QuizId({ params, title }: QuizIdProps) {
       <Card className="w-[550px]">
         <CardHeader>
           <CardTitle>{title}</CardTitle>
-          <CardDescription>
-            Number of questions: {options.length}
-          </CardDescription>
-          <Timer initialTime={30} callback={handleNextStep}/>
+          <div className="flex items-center justify-between">
+            <CardDescription>
+              Number of questions: {options.length}
+            </CardDescription>
+            <Timer initialTime={20} callback={handleNextStep} />
+          </div>
         </CardHeader>
         <CardContent>
           <RadioGroup

@@ -99,7 +99,7 @@ export default function QuizClient() {
   }
 
   function getSearchValue(event: React.ChangeEvent<HTMLInputElement>) {
-    setSearchValue(event.target.value.toLowerCase());
+    setSearchValue(event.target.value);
   }
 
   const filteredItems = quizLists.filter((list) =>

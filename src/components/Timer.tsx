@@ -1,39 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import React from "react";
+import useCountDown from "~/lib/hooks/useCountDown";
 
-const MILLISECONDS = 1000;
-
-interface TimerProps {
+interface TimerDownProps {
   initialTime: number;
-  callback: () => void
+  callback: () => void;
 }
 
-type Ref = ReturnType<typeof setTimeout>
-
-const Timer = ({initialTime, callback}: TimerProps) => {
-  const [seconds, setSeconds] = useState(initialTime);
-  const deadlineRef = useRef(Date.now() + initialTime * MILLISECONDS);
-  const ref = useRef<Ref>();
-
-  const getTime = (deadline: number) => {
-    const time = deadline - Date.now();
-    const calcSeconds = (Math.floor((time / MILLISECONDS) % 60));
-    setSeconds(calcSeconds)
-
-    if (calcSeconds <= 0) {
-      clearInterval(ref.current);
-      setSeconds(initialTime);
-      // callback()
-      return;
-    }
-  };
-
-  useEffect(() => {
-    ref.current = setInterval(() => getTime(deadlineRef.current), 200);
-
-    return () => clearInterval(ref.current);
-  }, []);
-
-  return seconds;
+const TimerDown = ({ initialTime, callback }: TimerDownProps) => {
+  const { seconds } = useCountDown({ initialTime, callback });
+  return <div>{seconds}</div>;
 };
 
-export default Timer;
+export default TimerDown;

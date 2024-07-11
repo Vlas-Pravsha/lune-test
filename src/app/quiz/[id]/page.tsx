@@ -20,7 +20,7 @@ import {
   type Option,
 } from "~/components/QuizClient";
 import { useLocalStorage } from "~/lib/hooks/useLocalStorage";
-import Timer from "~/components/Timer";
+import useCountDown from "~/lib/hooks/useCountDown";
 
 interface QuizIdProps {
   params: { id: string };
@@ -31,35 +31,39 @@ export default function QuizId({ params, title }: QuizIdProps) {
   const [step, setStep] = useState<number>(0);
   const [correct, setCorrect] = useState<number>(0);
   const { setItem } = useLocalStorage("selectedOption");
+  const { seconds, resetTimer } = useCountDown({
+    initialTime: 10,
+    callback: handleNextStep,
+  });
 
   const quiz: Quiz | undefined = initialQuizzes.find((q) => q.id === params.id);
   const options: Option[] = quiz?.options ?? [];
   const currentOption: Option | undefined = options[step];
 
-
-  const handleCorrectOption = (index: number) => {
+  function handleCorrectOption(index: number) {
     if (currentOption?.correct === index) {
       setCorrect((prev) => prev + 1);
     }
-  };
+  }
 
-  const handleNextStep = () => {
+  function handleNextStep() {
     setStep((prev) => prev + 1);
-  };
+    resetTimer();
+  }
 
-  const renderContent = () => {
+  function renderContent() {
     if (currentOption) {
       return (
         <>
-        <Options
-          option={currentOption}
-          setCorrectOption={handleCorrectOption}
-        />
-        <Timer initialTime={5} callback={handleNextStep} options={options}/></>
+          <Options
+            option={currentOption}
+            setCorrectOption={handleCorrectOption}
+          />
+        </>
       );
     }
     return <QuizResult options={options} correct={correct} />;
-  };
+  }
 
   return (
     <div className="flex h-screen w-full items-center justify-center">
@@ -70,6 +74,7 @@ export default function QuizId({ params, title }: QuizIdProps) {
             <CardDescription>
               Number of questions: {options.length}
             </CardDescription>
+            {currentOption && seconds}
           </div>
         </CardHeader>
         <CardContent>

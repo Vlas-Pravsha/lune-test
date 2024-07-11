@@ -11,7 +11,7 @@ type IntervalRef = ReturnType<typeof setTimeout>;
 
 const useCountDown = ({ initialTime, callback }: useCountDownProps) => {
   const [seconds, setSeconds] = useState(initialTime);
-  const [resetTrigger, setResetTrigger] = useState(false); 
+  const [resetTrigger, setResetTrigger] = useState(false);
   const deadlineRef = useRef(Date.now() + initialTime * MILLISECONDS);
   const intervalRef = useRef<IntervalRef>();
 
@@ -22,7 +22,8 @@ const useCountDown = ({ initialTime, callback }: useCountDownProps) => {
 
     if (calcSeconds <= 0) {
       clearInterval(intervalRef.current);
-      setResetTrigger(prev => !prev);
+      setResetTrigger((prev) => !prev);
+      setSeconds(initialTime);
       callback();
     }
   };
@@ -32,9 +33,15 @@ const useCountDown = ({ initialTime, callback }: useCountDownProps) => {
     intervalRef.current = setInterval(() => getTime(deadlineRef.current), 200);
 
     return () => clearInterval(intervalRef.current);
-  }, [resetTrigger]); 
+  }, [resetTrigger]);
 
-  return { seconds };
+  const resetTimer = () => {
+    deadlineRef.current = Date.now() + initialTime * MILLISECONDS;
+
+    setSeconds(initialTime);
+  };
+
+  return { seconds, resetTimer };
 };
 
 export default useCountDown;

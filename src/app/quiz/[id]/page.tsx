@@ -36,6 +36,7 @@ export default function QuizId({ params, title }: QuizIdProps) {
   const options: Option[] = quiz?.options ?? [];
   const currentOption: Option | undefined = options[step];
 
+
   const handleCorrectOption = (index: number) => {
     if (currentOption?.correct === index) {
       setCorrect((prev) => prev + 1);
@@ -49,10 +50,12 @@ export default function QuizId({ params, title }: QuizIdProps) {
   const renderContent = () => {
     if (currentOption) {
       return (
+        <>
         <Options
           option={currentOption}
           setCorrectOption={handleCorrectOption}
         />
+        <Timer initialTime={5} callback={handleNextStep} options={options}/></>
       );
     }
     return <QuizResult options={options} correct={correct} />;
@@ -67,7 +70,6 @@ export default function QuizId({ params, title }: QuizIdProps) {
             <CardDescription>
               Number of questions: {options.length}
             </CardDescription>
-            <Timer initialTime={20} callback={handleNextStep} />
           </div>
         </CardHeader>
         <CardContent>

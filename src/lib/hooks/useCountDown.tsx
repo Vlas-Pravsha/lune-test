@@ -7,12 +7,13 @@ interface useCountDownProps {
   callback: () => void;
 }
 
-type Ref = ReturnType<typeof setTimeout>;
+type IntervalRef = ReturnType<typeof setTimeout>;
 
 const useCountDown = ({ initialTime, callback }: useCountDownProps) => {
   const [seconds, setSeconds] = useState(initialTime);
+  const [resetTrigger, setResetTrigger] = useState(false); 
   const deadlineRef = useRef(Date.now() + initialTime * MILLISECONDS);
-  const ref = useRef<Ref>();
+  const intervalRef = useRef<IntervalRef>();
 
   const getTime = (deadline: number) => {
     const time = deadline - Date.now();
@@ -20,18 +21,18 @@ const useCountDown = ({ initialTime, callback }: useCountDownProps) => {
     setSeconds(calcSeconds);
 
     if (calcSeconds <= 0) {
-      clearInterval(ref.current);
-      setSeconds(initialTime);
+      clearInterval(intervalRef.current);
+      setResetTrigger(prev => !prev);
       callback();
-      return;
     }
   };
 
   useEffect(() => {
-    ref.current = setInterval(() => getTime(deadlineRef.current), 200);
+    deadlineRef.current = Date.now() + initialTime * MILLISECONDS;
+    intervalRef.current = setInterval(() => getTime(deadlineRef.current), 200);
 
-    return () => clearInterval(ref.current);
-  }, []);
+    return () => clearInterval(intervalRef.current);
+  }, [resetTrigger]); 
 
   return { seconds };
 };

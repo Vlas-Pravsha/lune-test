@@ -1,48 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-export const useLocalStorage = (key: string) => {
-  const setItem = (value: unknown) => {
-    try {
-      window.localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-      console.log(error);
-    }
+import { useEffect, useState } from "react";
+
+const useLocalStorage = <T,>(key: string, initialValue: T) => {
+  const getValue = (): T => {
+    const storedValue = localStorage.getItem(key);
+    return storedValue !== null ? (JSON.parse(storedValue) as T) : initialValue;
   };
 
-  const getItem = () => {
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : undefined;
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const [value, setValue] = useState<T>(getValue);
 
-  const removeItem = () => {
-    try {
-      window.localStorage.removeItem(key);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
 
-  return { setItem, getItem, removeItem };
+  return [value, setValue] as const;
 };
 
-// import { useEffect, useState } from 'react'
-
-// const useLocalStorage = (key: string, initialValue: string[]) => {
-//   const getValue = () => {
-//     const storedValue = localStorage.getItem(key)
-//     return storedValue !== null ? JSON.parse(storedValue) : initialValue
-//   }
-
-//   const [value, setValue] = useState(getValue)
-
-//   useEffect(() => {
-//     localStorage.setItem(key, JSON.stringify(value))
-//   }, [key, value])
-
-//   return [value, setValue]
-// }
-
-// export default useLocalStorage
+export default useLocalStorage;

@@ -19,8 +19,8 @@ import {
   type Quiz,
   type Option,
 } from "~/components/QuizClient";
-import { useLocalStorage } from "~/lib/hooks/useLocalStorage";
 import useCountDown from "~/lib/hooks/useCountDown";
+import useLocalStorage from "~/lib/hooks/useLocalStorage";
 
 interface QuizIdProps {
   params: { id: string };
@@ -30,13 +30,13 @@ interface QuizIdProps {
 export default function QuizId({ params, title }: QuizIdProps) {
   const [step, setStep] = useState<number>(0);
   const [correct, setCorrect] = useState<number>(0);
-  const { setItem } = useLocalStorage("selectedOption");
   const { seconds, resetTimer } = useCountDown({
-    initialTime: 10,
+    initialTime: 20,
     callback: handleNextStep,
   });
+  const [value] = useLocalStorage("quizList", initialQuizzes);
 
-  const quiz: Quiz | undefined = initialQuizzes.find((q) => q.id === params.id);
+  const quiz: Quiz | undefined = value.find((quiz) => quiz.id === params.id);
   const options: Option[] = quiz?.options ?? [];
   const currentOption: Option | undefined = options[step];
 
@@ -78,10 +78,7 @@ export default function QuizId({ params, title }: QuizIdProps) {
           </div>
         </CardHeader>
         <CardContent>
-          <RadioGroup
-            onValueChange={(value) => setItem(value)}
-            className="flex flex-col gap-4"
-          >
+          <RadioGroup className="flex flex-col gap-4">
             {renderContent()}
           </RadioGroup>
         </CardContent>

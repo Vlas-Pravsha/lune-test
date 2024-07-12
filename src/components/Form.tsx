@@ -59,7 +59,7 @@ const Forma = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50">
-      <div className="relative w-full max-w-md rounded bg-white p-8 shadow-md">
+      <div className="absolute top-[15%] w-full max-w-3xl rounded bg-white p-8 shadow-md">
         <Button
           className="absolute right-2 top-2"
           variant="ghost"
@@ -90,7 +90,23 @@ const Forma = ({
                   name={`options.${index}.title`}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Question name</FormLabel>
+                      <div className="flex items-center justify-between">
+                        <FormLabel className="text-lg font-semibold">
+                          Question name
+                        </FormLabel>
+                        <div className="flex items-center gap-2">
+                          <h5 className="text-lg font-semibold">
+                            Delete options
+                          </h5>
+                          <Button
+                            variant="destructive"
+                            onClick={() => remove(index)}
+                            size="sm"
+                          >
+                            <Trash />
+                          </Button>
+                        </div>
+                      </div>
                       <FormControl>
                         <Input {...field} placeholder="Question name" />
                       </FormControl>
@@ -119,7 +135,7 @@ const Forma = ({
                             <FormMessage />
                             <Button
                               type="button"
-                              variant="default"
+                              variant="outline"
                               className="flex gap-2"
                               onClick={(e) => {
                                 console.log(e);
@@ -167,12 +183,6 @@ const Forma = ({
                     </FormItem>
                   )}
                 />
-                <div className="flex items-center gap-2">
-                  <h5 className="text-lg font-semibold">Delete options</h5>
-                  <Button variant="default" onClick={() => remove(index)}>
-                    <Trash />
-                  </Button>
-                </div>
               </div>
             ))}
 

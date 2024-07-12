@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const MILLISECONDS = 1000;
 
@@ -35,11 +35,11 @@ const useCountDown = ({ initialTime, callback }: useCountDownProps) => {
     return () => clearInterval(intervalRef.current);
   }, [resetTrigger]);
 
-  const resetTimer = () => {
+  const resetTimer = useCallback(() => {
     deadlineRef.current = Date.now() + initialTime * MILLISECONDS;
 
     setSeconds(initialTime);
-  };
+  }, [initialTime]);
 
   return { seconds, resetTimer };
 };

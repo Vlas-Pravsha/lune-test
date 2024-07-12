@@ -1,7 +1,7 @@
 import React from "react";
 import { type Option } from "./QuizClient";
-import { RadioGroupItem } from "./ui/radio-group";
 import { Label } from "./ui/label";
+import { Checkbox } from "./ui/checkbox";
 
 type OptionsProps = {
   option: Option;
@@ -17,10 +17,10 @@ const Options = ({ option, setCorrectOption }: OptionsProps) => {
         return (
           <div
             className="flex items-center space-x-2"
-            key={id}
             onClick={() => setCorrectOption(index)}
+            key={id}
           >
-            <RadioGroupItem value={variant} id={id} />
+            <Checkbox value={variant} id={id} />
             <Label htmlFor={id}>{variant}</Label>
           </div>
         );

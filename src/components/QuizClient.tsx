@@ -6,6 +6,7 @@ import { Button } from "~/components/ui/button";
 import QuizCard from "~/components/QuizCard";
 import Forma from "~/components/Form";
 import { Input } from "./ui/input";
+import useLocalStorage from "~/lib/hooks/useLocalStorage";
 
 export type Option = {
   id: string;
@@ -67,9 +68,8 @@ export const initialQuizzes: Quiz[] = [
 
 export default function QuizClient() {
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [quizLists, setQuizLists] = useState<Quiz[]>(initialQuizzes);
   const [searchValue, setSearchValue] = useState<string>("");
-
+  const [value, setValue] = useLocalStorage<Quiz[]>("quizList", initialQuizzes);
   const onClose = () => {
     setIsFormVisible(false);
   };
@@ -79,12 +79,12 @@ export default function QuizClient() {
   };
 
   function handleRemoveQuiz(id: string) {
-    const newOptions = quizLists.filter((option) => option.id !== id);
-    setQuizLists(newOptions);
+    const newOptions = value.filter((option) => option.id !== id);
+    setValue(newOptions);
   }
 
   function handleFormSubmit(data: Quiz) {
-    const newQuiz = {
+    const newQuiz: Quiz = {
       id: crypto.randomUUID(),
       title: data.title,
       options: data.options!.map((option) => ({
@@ -94,15 +94,14 @@ export default function QuizClient() {
         correct: option.correct,
       })),
     };
-
-    setQuizLists((prevQuizLists) => [...prevQuizLists, newQuiz]);
+    setValue((prevQuizLists) => [...prevQuizLists, newQuiz]);
   }
 
   function getSearchValue(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchValue(event.target.value);
   }
 
-  const filteredItems = quizLists.filter((list) =>
+  const filteredItems = value.filter((list) =>
     list.title.toLowerCase().includes(searchValue.trim().toLowerCase()),
   );
 
@@ -112,7 +111,7 @@ export default function QuizClient() {
         type="text"
         placeholder="Search by title"
         value={searchValue}
-        onChange={(event) => getSearchValue(event)}
+        onChange={getSearchValue}
       />
 
       {filteredItems.map((quiz) => (

@@ -54,14 +54,18 @@ export default function QuizId({ params, title }: QuizIdProps) {
   }
 
   useEffect(() => {
-    setProgress(50);
-  }, [currentOption]);
+    const calcPercentage = () => {
+      setProgress(Math.floor((step / options.length) * 100));
+    };
+
+    calcPercentage();
+  }, [step, options.length]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center">
       <Card className="w-[550px]">
         <CardHeader>
-          <Progress value={progress} />
+          {currentOption ? <Progress value={progress} /> : null}
           <CardTitle>{title}</CardTitle>
           <div className="flex items-center justify-between">
             <CardDescription>

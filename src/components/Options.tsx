@@ -1,7 +1,7 @@
 import React from "react";
 import { type Option } from "./QuizClient";
 import { Label } from "./ui/label";
-import { Checkbox } from "./ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 type OptionsProps = {
   option: Option;
@@ -10,7 +10,7 @@ type OptionsProps = {
 
 const Options = ({ option, setCorrectOption }: OptionsProps) => {
   return (
-    <>
+    <RadioGroup className="flex flex-col gap-4">
       <h2>{option.title}</h2>
       {option.variants.map((variant, index) => {
         const id = `${variant}-${index}`;
@@ -20,12 +20,12 @@ const Options = ({ option, setCorrectOption }: OptionsProps) => {
             onClick={() => setCorrectOption(index)}
             key={id}
           >
-            <Checkbox value={variant} id={id} />
+            <RadioGroupItem value={variant} id={id} />
             <Label htmlFor={id}>{variant}</Label>
           </div>
         );
       })}
-    </>
+    </RadioGroup>
   );
 };
 

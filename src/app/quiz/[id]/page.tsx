@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RadioGroup } from "~/components/ui/radio-group";
 import {
   Card,
@@ -21,6 +21,7 @@ import {
 } from "~/components/QuizClient";
 import useCountDown from "~/lib/hooks/useCountDown";
 import useLocalStorage from "~/lib/hooks/useLocalStorage";
+import { Progress } from "~/components/ui/progress";
 
 interface QuizIdProps {
   params: { id: string };
@@ -29,18 +30,19 @@ interface QuizIdProps {
 
 export default function QuizId({ params, title }: QuizIdProps) {
   const [step, setStep] = useState<number>(0);
+  const [progress, setProgress] = useState<number>(0);
   const [correct, setCorrect] = useState<number>(0);
+  const [value] = useLocalStorage("quizList", initialQuizzes);
   const { seconds, resetTimer } = useCountDown({
     initialTime: 20,
     callback: handleNextStep,
   });
-  const [value] = useLocalStorage("quizList", initialQuizzes);
 
   const quiz: Quiz | undefined = value.find((quiz) => quiz.id === params.id);
   const options: Option[] = quiz?.options ?? [];
   const currentOption: Option | undefined = options[step];
 
-  function handleCorrectOption(index: number) {
+  function setCorrectOption(index: number) {
     if (currentOption?.correct === index) {
       setCorrect((prev) => prev + 1);
     }
@@ -51,24 +53,15 @@ export default function QuizId({ params, title }: QuizIdProps) {
     resetTimer();
   }
 
-  function renderContent() {
-    if (currentOption) {
-      return (
-        <>
-          <Options
-            option={currentOption}
-            setCorrectOption={handleCorrectOption}
-          />
-        </>
-      );
-    }
-    return <QuizResult options={options} correct={correct} />;
-  }
+  useEffect(() => {
+    setProgress(50);
+  }, [currentOption]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center">
       <Card className="w-[550px]">
         <CardHeader>
+          <Progress value={progress} />
           <CardTitle>{title}</CardTitle>
           <div className="flex items-center justify-between">
             <CardDescription>
@@ -79,7 +72,14 @@ export default function QuizId({ params, title }: QuizIdProps) {
         </CardHeader>
         <CardContent>
           <RadioGroup className="flex flex-col gap-4">
-            {renderContent()}
+            {currentOption ? (
+              <Options
+                option={currentOption}
+                setCorrectOption={setCorrectOption}
+              />
+            ) : (
+              <QuizResult options={options} correct={correct} />
+            )}
           </RadioGroup>
         </CardContent>
         <CardFooter className="flex justify-between">

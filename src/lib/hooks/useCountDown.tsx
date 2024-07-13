@@ -2,31 +2,36 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const MILLISECONDS = 1000;
 
-interface useCountDownProps {
+type CallbackFunction = () => void;
+
+interface UseCountDownProps {
   initialTime: number;
-  callback: () => void;
+  callback: CallbackFunction;
 }
 
 type IntervalRef = ReturnType<typeof setTimeout>;
 
-const useCountDown = ({ initialTime, callback }: useCountDownProps) => {
+const useCountDown = ({ initialTime, callback }: UseCountDownProps) => {
   const [seconds, setSeconds] = useState(initialTime);
   const [resetTrigger, setResetTrigger] = useState(false);
   const deadlineRef = useRef(Date.now() + initialTime * MILLISECONDS);
   const intervalRef = useRef<IntervalRef>();
 
-  const getTime = (deadline: number) => {
-    const time = deadline - Date.now();
-    const calcSeconds = Math.floor((time / MILLISECONDS) % 60);
-    setSeconds(calcSeconds);
+  const getTime = useCallback(
+    (deadline: number) => {
+      const time = deadline - Date.now();
+      const calcSeconds = Math.floor((time / MILLISECONDS) % initialTime);
+      setSeconds(calcSeconds);
 
-    if (calcSeconds <= 0) {
-      clearInterval(intervalRef.current);
-      setResetTrigger((prev) => !prev);
-      setSeconds(initialTime);
-      callback();
-    }
-  };
+      if (calcSeconds <= 0) {
+        clearInterval(intervalRef.current);
+        setResetTrigger((prev) => !prev);
+        setSeconds(initialTime);
+        callback();
+      }
+    },
+    [callback, initialTime],
+  );
 
   useEffect(() => {
     deadlineRef.current = Date.now() + initialTime * MILLISECONDS;

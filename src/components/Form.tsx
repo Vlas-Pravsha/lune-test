@@ -195,7 +195,7 @@ const Forma = ({
                   append({
                     id: "",
                     title: "",
-                    variants: [],
+                    variants: ["Answer 1"],
                     correct: 0,
                   });
                 }}

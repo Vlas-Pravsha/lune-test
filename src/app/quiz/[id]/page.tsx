@@ -32,6 +32,7 @@ export default function QuizId({ params, title }: QuizIdProps) {
   const [step, setStep] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
   const [correct, setCorrect] = useState<number>(0);
+  const [isAnswered, setIsAnswered] = useState<boolean>(false);
   const [value] = useLocalStorage("quizList", initialQuizzes);
   const { seconds, resetTimer } = useCountDown({
     initialTime: 20,
@@ -43,13 +44,15 @@ export default function QuizId({ params, title }: QuizIdProps) {
   const currentOption: Option | undefined = options[step];
 
   function setCorrectOption(index: number) {
-    if (currentOption?.correct === index) {
+    if (!isAnswered && currentOption?.correct === index) {
       setCorrect((prev) => prev + 1);
+      setIsAnswered(true);
     }
   }
 
   function handleNextStep() {
     setStep((prev) => prev + 1);
+    setIsAnswered(false);
     resetTimer();
   }
 
